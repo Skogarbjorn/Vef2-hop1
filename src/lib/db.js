@@ -1,6 +1,7 @@
 import pg from 'pg';
 import dotenv from 'dotenv';
 import process from 'node:process';
+import { toPositiveNumberOrDefault } from './lib.js';
 
 dotenv.config();
 
@@ -30,6 +31,29 @@ export async function query(text, params = []) {
 	} finally {
 		client.release();
 	}
+}
+
+export async function pagedQuery(text, params = [], { limit = 10, offset = 0 }) {
+	limit = toPositiveNumberOrDefault(limit, 10);
+	offset = toPositiveNumberOrDefault(offset, 0);
+
+	const limitOffset = params.length + 1;
+	const offsetOffset = params.length + 2;
+	const querySQL = `${text} LIMIT $${limitOffset} OFFSET $${offsetOffset}`;
+
+  const data = await query(querySQL, [...params, limit, offset]);
+
+	const countSQL = `SELECT COUNT(*) AS total FROM (${text.replace(/ORDER BY .*/i, '')}) AS subquery`;
+	console.log(countSQL);
+	const countResult = await query(countSQL, params);
+	const total = parseInt(countResult.rows[0].total, 10);
+
+	return {
+		data: data.rows,
+		offset,
+		limit,
+		total,
+	};
 }
 
 export async function end() {

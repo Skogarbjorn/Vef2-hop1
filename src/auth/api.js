@@ -1,6 +1,6 @@
 import express from 'express';
 import jwt from 'jsonwebtoken';
-import { createUser, findByEmailOrUsername, findById } from '../auth/users.js';
+import { createUser, deleteById, findByEmailOrUsername, findById } from '../auth/users.js';
 import { 
 	usernameValidator,
 	emailValidator,
@@ -20,8 +20,6 @@ async function registerRoute(req, res) {
 	const { username, email, password } = req.body;
 
 	const result = await createUser(username, email, password);
-
-	console.info(result);
 
 	delete result.password;
 
@@ -64,6 +62,26 @@ async function currentUserRoute(req, res) {
 	return res.json(user);
 }
 
+async function deleteCurrentUserRoute(req, res) {
+	const { user: { id } = {} } = req;
+
+	const user = await findById(id);
+
+	if (!user) {
+		return res.status(404).json({ error: 'User not found' });
+	}
+
+	const result = await deleteById(id);
+
+	if (!result) {
+		return res.status(500).json({ error: 'Something went wrong' });
+	}
+
+	delete result.password;
+
+	return res.status(204).send();
+}
+
 router.post('/users/login',
 	identifierValidator,
 	passwordValidator,
@@ -84,5 +102,12 @@ router.post('/users/register',
 
 router.get('/users/me',
 	requireAuth,
+	validationCheck,
 	catchErrors(currentUserRoute)
+);
+
+router.delete('/users/me',
+	requireAuth,
+	validationCheck,
+	catchErrors(deleteCurrentUserRoute)
 );

@@ -1,6 +1,9 @@
-import { body, param, query } from 'express-validator';
+import { body, param, query as ex_query } from 'express-validator';
 import { findByEmail, findByEmailOrUsername, findByUsername } from '../auth/users.js';
 import { verifyPassword } from '../auth/users.js';
+import { query } from '../lib/db.js';
+import { doIntervalsIntersect } from '../lib/dateOverlap.js';
+import { findById as findPracticeById } from '../api/practice.js';
 
 export const usernameValidator = body('username')
   .isLength({ min: 1, max: 64 })
@@ -67,4 +70,109 @@ export const identifierAndPasswordValidValidator = body('identifier').custom(
 		}
 
 		return Promise.resolve();
+	});
+
+export const pagingQuerystringValidator = [
+	ex_query('offset')
+	  .optional()
+	  .isInt({ min: 0 })
+	  .withMessage('offset must not be negative'),
+	ex_query('limit')
+	  .optional()
+	  .isInt({ min: 1 })
+	  .withMessage('limit must be positive')
+];
+
+export const dateValidator = body('date')
+  .exists()
+  .not().isEmpty()
+  .withMessage('date cannot be empty')
+  .isISO8601()
+  .toDate()
+  .withMessage('date must be in format "yyyy-mm-dd hh:mm:ss"');
+
+export const durationValidator = body('duration')
+  .exists()
+  .withMessage('duration must be defined')
+  .trim()
+  .custom((duration) => { console.log(duration); return true; })
+	.matches(/^(\d+\s*(hour|minute|second|day)s?\s*)+$/i)
+  .withMessage('duration must be in format "X hours", "Y minutes", etc.');
+
+export const agesValidator = body('ages')
+  .exists()
+  .isIn(['5-7 ára', '8-12 ára', 'fullorðnir'])
+  .withMessage('ages must be one of the schemes defined in database');
+
+export const capacityValidator = body('capacity')
+  .isInt({ min: 1 })
+  .withMessage('capacity must be an integer, minimum 1');
+
+export const dateDoesNotOverlapValidator = body('date').custom(
+	async (date, { req: { body: req_body } = {} }) => {
+		const { duration } = req_body;
+
+		const dateSQL = `SELECT * FROM practice`;
+
+		const result = await query(dateSQL);
+
+		if (!result) {
+			return Promise.resolve();
+		}
+
+		for (const row of result.rows) {
+			if (doIntervalsIntersect(date, duration, row.date, row.duration)) {
+				return Promise.reject(new Error('date is already occupied'));
+			}
+		}
+
+		return Promise.resolve();
+	});
+
+export const userNotSignedUpValidator = param('id').custom(
+	async (id, { req: { user: req_user } = {} }) => {
+		const findSQL = `
+		  SELECT * FROM practice_signups WHERE user_id = $1 AND practice_id = $2`;
+
+		const result = await query(findSQL, [req_user.id, id]);
+
+		if (result.rowCount === 1) {
+			return Promise.reject(new Error('user is already signed up'));
+		}
+
+		return Promise.resolve();
+	});
+
+export const courseIdValidator = param('id')
+  .exists()
+  .withMessage('course id must be defined')
+  .custom(
+		async (id) => {
+			const result = await findPracticeById(id);
+
+			if (!result) {
+				return Promise.reject(new Error('course does not exist'));
+			}
+
+			return Promise.resolve();
+		});
+
+export const practiceCapacityNotFullValidator = param('id').custom(
+	async (id) => {
+		const result = await findPracticeById(id);
+
+		const capacity = result.capacity;
+
+		const signupsSQL = `
+		  SELECT * FROM practice_signups WHERE practice_id = $1`;
+
+		const signupsResult = await query(signupsSQL, [id]);
+
+		const signupsNum = signupsResult.rows.length;
+
+		if (signupsNum < capacity) {
+			return Promise.resolve();
+		}
+
+		return Promise.reject(new Error('practice already full'));
 	});

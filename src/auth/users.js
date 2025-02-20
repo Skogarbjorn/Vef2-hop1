@@ -86,3 +86,19 @@ export async function findByEmailOrUsername(identifier) {
 		return await findByUsername(identifier);
 	}
 }
+
+export async function deleteById(id) {
+	const deleteUserSQL = `DELETE FROM users WHERE id = $1 RETURNING *`;
+
+	try {
+		const result = await query(deleteUserSQL, [id]);
+
+		if (result.rowCount === 1) {
+			return result.rows[0];
+		}
+	} catch (err) {
+		console.error('Could not delete user by id', err);
+	}
+
+	return null;
+}

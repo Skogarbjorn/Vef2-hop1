@@ -3,6 +3,7 @@ import expressWs from 'express-ws';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { router as registerRouter } from './auth/api.js';
+import { router as indexRouter } from './api/index.js';
 import process from 'node:process';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -18,6 +19,7 @@ app.set('views', path.join(__dirname, 'src/views'));
 app.set('view engine', 'ejs');
 
 app.use(registerRouter);
+app.use(indexRouter);
 
 app.use((_req, res) => {
 	res.status(404).json({ error: "Not found" });
