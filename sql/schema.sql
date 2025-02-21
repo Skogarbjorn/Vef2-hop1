@@ -18,19 +18,20 @@ CREATE TABLE IF NOT EXISTS public.practice (
 
 CREATE TABLE IF NOT EXISTS public.practice_signups (
 	id serial primary key,
-	user_id int references users(id) not null on delete cascade,
-	practice_id int references practice(id) not null on delete cascade,
+	user_id int references users(id) on delete cascade not null,
+	practice_id int references practice(id) on delete cascade not null,
 	signup_date timestamp with time zone not null default current_timestamp,
 	unique (user_id, practice_id)
 );
 
 CREATE TABLE IF NOT EXISTS public.courses (
 	id serial primary key,
-	name text not null,
+	name varchar(256) not null,
 	description text,
 	level text check (level in ('byrjendur', 'miðstig', 'hæsta stig')) not null,
 	start_date date not null,
-	end_date date not null
+	end_date date not null,
+	created timestamp with time zone not null default current_timestamp
 );
 
 CREATE TABLE IF NOT EXISTS public.course_signups (
@@ -39,4 +40,13 @@ CREATE TABLE IF NOT EXISTS public.course_signups (
 	course_id int references courses(id) on delete cascade,
 	signup_date timestamp with time zone not null default current_timestamp,
 	unique (user_id, course_id)
+);
+
+CREATE TABLE IF NOT EXISTS public.moves (
+	id serial primary key,
+	title varchar(128) not null,
+	description text,
+	image varchar(256),
+	video varchar(256),
+	created timestamp with time zone not null default current_timestamp
 );

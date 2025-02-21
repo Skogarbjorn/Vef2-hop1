@@ -1,0 +1,157 @@
+[
+	{
+		"href": "/profa",
+		"methods": [
+			{
+				"GET": {
+					"admin": false
+				}
+			},
+			{
+				"POST": {
+					"admin": true
+				}
+			}
+		]
+	},
+	{
+		"href": "/profa/{id}",
+		"methods": [
+			{
+				"GET": {
+					"admin": true
+				}
+			},
+			{
+				"POST": {
+					"admin": false
+				}
+			},
+			{
+				"DELETE": {
+					"admin": true
+				}
+			}
+		]
+	},
+	{
+		"href": "/namskeid",
+		"methods": [
+			{
+				"GET": {
+					"admin": false
+				}
+			},
+			{
+				"POST": {
+					"admin": true
+				}
+			}
+		]
+	},
+	{
+		"href": "/namskeid/{id}",
+		"methods": [
+			{
+				"GET": {
+					"admin": true
+				}
+			},
+			{
+				"POST": {
+					"admin": false
+				}
+			},
+			{
+				"DELETE": {
+					"admin": true
+				}
+			}
+		]
+	},
+	{
+		"href": "/laera",
+		"methods": [
+			{
+				"GET": {
+					"admin": false
+				}
+			},
+			{
+				"POST": {
+					"admin": true
+				}
+			}
+		]
+	},
+	{
+		"href": "/laera/{id}",
+		"methods": [
+			{
+				"GET": {
+					"admin": false
+				}
+			}
+		]
+	},
+	{
+		"href": "/users",
+		"methods": [
+			{
+				"GET": {
+					"admin": true
+				}
+			}
+		]
+	},
+	{
+		"href": "/users/me",
+		"methods": [
+			{
+				"GET": {
+					"admin": false
+				}
+			},
+			{
+				"DELETE": {
+					"admin": false
+				}
+			}
+		]
+	},
+	{
+		"href": "/users/{id}",
+		"methods": [
+			{
+				"GET": {
+					"admin": true
+				}
+			},
+			{
+				"DELETE": {
+					"admin": true
+				}
+			}
+		]
+	},
+	{
+		"href": "/users/login",
+		"methods": [
+			{
+				"POST": {
+					"admin": false
+				}
+			}
+		]
+	},
+	{
+		"href": "/users/register",
+		"methods": [
+			{
+				"POST": {
+					"admin": false
+				}
+			}
+		]
+	}
+]

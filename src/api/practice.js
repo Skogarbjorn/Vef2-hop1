@@ -26,25 +26,47 @@ export async function addPractice(req, res) {
 	const insertSQL = `
 	  INSERT INTO practice (date, duration, ages, capacity) VALUES ($1, $2, $3, $4) RETURNING *`;
 
-	const result = await query(insertSQL, [date, duration, ages, capacity]);
+	const result = await query(insertSQL, [
+		xss(date), 
+		xss(duration), 
+		xss(ages), 
+		xss(capacity)
+	]);
 
 	if (!result) {
 		return res.status(500).json({ error: 'Something went wrong' });
 	}
 
-	return res.status(201).json(result);
+	return res.status(201).json(result.rows);
 }
 
 export async function listPracticeSingular(req, res) {
 	const { id } = req.params;
-	
+	const { offset = 0, limit = 10 } = req.query;
+
 	const result = await findById(id);
 
 	if (!result) {
 		return res.status(404).json({ error: 'Not found' });
 	}
 
-	return res.json(result);
+	const signedSQL = `
+	  SELECT * FROM practice_signups WHERE practice_id = $1`;
+
+	const signedResult = await pagedQuery(signedSQL, [id], { offset, limit });
+
+	const signedResultWithPaging = addPageMetadata(
+		signedResult,
+		req.path,
+		{ offset, limit, total: signedResult.total }
+	);
+
+	const resultWithSignups = {
+		...result,
+		signups: signedResultWithPaging
+	}
+
+	return res.json(resultWithSignups);
 }
 
 export async function findById(id) {
@@ -82,5 +104,25 @@ export async function signToPractice(req, res) {
 		return res.status(500).json({ error: 'Something went wrong' });
 	}
 
-	return res.status(201).json(result);
+	return res.status(201).json(result.rows);
+}
+
+export async function deletePractice(req, res) {
+	const { id } = req.params;
+
+	const findResult = await findById(id);
+
+	if (!findResult) {
+		return res.status(404).json({ error: 'Not found' });
+	}
+
+	const deleteSQL = `DELETE FROM practice WHERE id = $1 RETURNING *`;
+
+	const result = await query(deleteSQL, [id]);
+
+	if (!result) {
+		return res.status(500).json({ error: 'Something went wrong' });
+	}
+
+	return res.status(204).send();
 }

@@ -1,31 +1,36 @@
 ## Routes
 
 / 
-  GET
+  GET               ***
 
 /profa 
   GET               ***
   POST(admin)       ***
 
 /profa/:id 
-  GET               ***
+  GET(admin)        ***
   POST              ***
-  DELETE(admin)
+  DELETE(admin)     ***
+  PATCH(admin)
 
 /namskeid 
-  GET 
-  POST(admin)
+  GET               ***
+  POST(admin)       ***
 
 /namskeid/:id 
-  POST 
-  DELETE(admin)
+  GET               ***
+  POST              ***
+  DELETE(admin)     ***
+  PATCH(admin)
 
 /laera 
-  GET 
-  POST(admin)
+  GET               ***
+  POST(admin)       ***
 
 /laera/:id 
-  GET 
+  GET               ***
+  DELETE(admin)
+  PATCH(admin)
 
 /users 
   GET(admin)        ***
@@ -33,7 +38,6 @@
 /users/me 
   GET               ***
   DELETE            ***
-  PATCH
 
 /users/:id 
   GET(admin)        ***
