@@ -121,6 +121,16 @@ router.get('/laera/:id',
 	catchErrors(listMove)
 );
 
+router.patch('/laera/:id',
+	moveIdValidator,
+	moveTitleValidator,
+	moveDescriptionValidator,
+	moveImageValidator,
+	moveVideoValidator,
+	validationCheck,
+	catchErrors(updateMove)
+);
+
 router.get('/users',
 	requireAdmin,
 	pagingQuerystringValidator,

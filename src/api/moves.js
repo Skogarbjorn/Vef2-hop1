@@ -1,5 +1,6 @@
+import { isString } from "node:util";
 import { addPageMetadata } from "../lib/addPageMetadata.js";
-import { pagedQuery, query } from "../lib/db.js";
+import { pagedQuery, partialUpdate, query } from "../lib/db.js";
 
 export async function listMoves(req, res) {
 	const { offset = 0, limit = 10 } = req.query;
@@ -60,6 +61,27 @@ export async function addMove(req, res) {
 	}
 
 	return res.status(201).json(result.rows);
+}
+
+export async function updateMove(req, res) {
+	const { id } = req.params;
+	const { title, description, image, video } = req.body;
+
+	const params = [
+		typeof title === 'string' ? xss(title) : null,
+		typeof description === 'string' ? xss(description) : null,
+		typeof image === 'string' ? xss(image) : null,
+		typeof video === 'string' ? xss(video) : null,
+	];
+
+	const fields = [
+		typeof title === 'string' ? 'title' : null,
+		typeof description === 'string' ? 'description' : null,
+		typeof image === 'string' ? 'image' : null,
+		typeof video === 'string' ? 'video' : null,
+	];
+
+	//const result = await partialUpdate('moves', id, 
 }
 
 export async function findById(id) {

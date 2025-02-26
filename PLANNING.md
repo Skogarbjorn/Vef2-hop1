@@ -25,7 +25,7 @@
 
 /laera 
   GET               ***
-  POST(admin)       ***
+  POST(admin)       TODO-add to image/video service
 
 /laera/:id 
   GET               ***

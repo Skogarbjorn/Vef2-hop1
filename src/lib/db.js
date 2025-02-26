@@ -56,6 +56,33 @@ export async function pagedQuery(text, params = [], { limit = 10, offset = 0 }) 
 	};
 }
 
+export async function partialUpdate(table, id, fields, params) {
+	const fieldsFiltered = fields.filter(field => field);
+	const paramsFiltered = params.filter(param => param);
+
+	if (fieldsFiltered.length === 0) {
+		return null;
+	}
+
+	if (fieldsFiltered.length !== paramsFiltered.length) {
+		throw new Error('fields and params must be equal in length');
+	}
+
+	const updates = fieldsFiltered.map((field, index) => {
+		`${field} = $${i+2}`
+	});
+
+	const updateSQL = `
+	  UPDATE ${table}
+	  SET ${updates.join(', ')}
+	  WHERE id = $1 
+	  RETURNING *`;
+
+	const result = await query(updateSQL, [...id, paramsFiltered]);
+
+	return result;
+}
+
 export async function end() {
 	await pool.end();
 }
