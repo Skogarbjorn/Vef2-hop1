@@ -110,26 +110,6 @@ export const capacityValidator = body('capacity')
   .isInt({ min: 1 })
   .withMessage('capacity must be an integer, minimum 1');
 
-export const dateDoesNotOverlapValidator = body('date').custom(
-	async (date, { req: { body: req_body } = {} }) => {
-		const { duration } = req_body;
-
-		const dateSQL = `SELECT * FROM practice`;
-
-		const result = await query(dateSQL);
-
-		if (!result) {
-			return Promise.resolve();
-		}
-
-		for (const row of result.rows) {
-			if (doIntervalsIntersect(date, duration, row.date, row.duration)) {
-				return Promise.reject(new Error('date is already occupied'));
-			}
-		}
-
-		return Promise.resolve();
-	});
 
 export const userNotSignedUpPracticeValidator = param('id').custom(
 	async (id, { req: { user: req_user } = {} }) => {
