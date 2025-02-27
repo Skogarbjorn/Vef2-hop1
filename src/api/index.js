@@ -3,10 +3,10 @@ import { requireAdmin, requireAuth } from '../auth/passport.js';
 import { catchErrors } from '../lib/catchErrors.js';
 import { deleteUser, listUser, listUsers } from './users.js';
 import { validationCheck } from '../validate/helpers.js';
-import { agesValidator, capacityValidator, practiceIdValidator, courseIdValidator, dateDoesNotOverlapValidator, dateValidator, descriptionValidator, durationValidator, endDateValidator, levelValidator, nameValidator, pagingQuerystringValidator, practiceCapacityNotFullValidator, startDateValidator, userNotSignedUpPracticeValidator, userNotSignedUpCourseValidator, moveVideoValidator, moveImageValidator, moveDescriptionValidator, moveTitleValidator, moveIdValidator } from '../validate/validators.js';
-import { addPractice, deletePractice, listPractice, listPracticeSingular, signToPractice } from './practice.js';
+import { agesValidator, capacityValidator, practiceIdValidator, courseIdValidator, dateValidator, descriptionValidator, durationValidator, endDateValidator, levelValidator, nameValidator, pagingQuerystringValidator, practiceCapacityNotFullValidator, startDateValidator, userNotSignedUpPracticeValidator, userNotSignedUpCourseValidator, moveVideoValidator, moveImageValidator, moveDescriptionValidator, moveTitleValidator, moveIdValidator } from '../validate/validators.js';
+import { addPractice, deletePractice, listPractice, listPracticeSingular, signToPractice, updatePractice } from './practice.js';
 import { addCourse, deleteCourse, listCourse, listCourses, signToCourse } from './courses.js';
-import { addMove, listMove, listMoves } from './moves.js';
+import { addMove, listMove, listMoves, updateMove } from './moves.js';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { readFile } from 'node:fs/promises';
@@ -31,7 +31,6 @@ router.post('/profa',
 	durationValidator,
 	agesValidator,
 	capacityValidator,
-	dateDoesNotOverlapValidator,
 	validationCheck,
 	catchErrors(addPractice)
 );
@@ -58,6 +57,17 @@ router.delete('/profa/:id',
 	validationCheck,
 	catchErrors(deletePractice)
 );
+
+router.patch('/profa/:id',
+	requireAdmin,
+	practiceIdValidator,
+	dateValidator,
+	durationValidator,
+	agesValidator,
+	capacityValidator,
+	validationCheck,
+	catchErrors(updatePractice)
+)
 
 router.get('/namskeid',
 	pagingQuerystringValidator,

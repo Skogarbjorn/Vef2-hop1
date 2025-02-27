@@ -1,5 +1,6 @@
 import { addPageMetadata } from "../lib/addPageMetadata.js";
-import { pagedQuery, query } from "../lib/db.js";
+import { pagedQuery, partialUpdate, query } from "../lib/db.js";
+import xss from 'xss';
 
 export async function listPractice(req, res) {
 	const { limit = 5, offset = 0 } = req.query;
@@ -27,7 +28,7 @@ export async function addPractice(req, res) {
 	  INSERT INTO practice (date, duration, ages, capacity) VALUES ($1, $2, $3, $4) RETURNING *`;
 
 	const result = await query(insertSQL, [
-		xss(date), 
+		date, 
 		xss(duration), 
 		xss(ages), 
 		xss(capacity)
@@ -106,6 +107,34 @@ export async function signToPractice(req, res) {
 
 	return res.status(201).json(result.rows);
 }
+
+export async function updatePractice(req, res) {
+	const { id } = req.params;
+	const { date, duration, ages, capacity } = req.body;
+
+	const params = [
+		date instanceof Date ? date : null,
+		duration instanceof Date ? xss(duration) : null,
+		typeof ages === 'string' ? xss(ages) : null,
+		typeof capacity === 'number' ? xss(capacity) : null,
+	];
+
+	const fields = [
+		date instanceof Date ? 'date' : null,
+		duration instanceof Date ? 'duration' : null,
+		typeof ages === 'string' ? 'ages' : null,
+		typeof capacity === 'number' ? 'capacity' : null,
+	];
+
+	const result = await partialUpdate('practice', id, fields, params);
+
+	if (!result) {
+		return res.status(500).json({ error: 'Something went wrong updating the move' });
+	}
+
+	return res.status(200).json(result.rows);
+}
+
 
 export async function deletePractice(req, res) {
 	const { id } = req.params;

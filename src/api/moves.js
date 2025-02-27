@@ -1,5 +1,6 @@
 import { addPageMetadata } from "../lib/addPageMetadata.js";
 import { pagedQuery, partialUpdate, query } from "../lib/db.js";
+import xss from 'xss';
 
 export async function listMoves(req, res) {
 	const { offset = 0, limit = 10 } = req.query;
@@ -80,7 +81,13 @@ export async function updateMove(req, res) {
 		typeof video === 'string' ? 'video' : null,
 	];
 
-	//const result = await partialUpdate('moves', id, 
+	const result = await partialUpdate('moves', id, fields, params);
+
+	if (!result) {
+		return res.status(500).json({ error: 'Something went wrong updating the move' });
+	}
+
+	return res.status(200).json(result.rows);
 }
 
 export async function findById(id) {
