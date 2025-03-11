@@ -1,53 +1,53 @@
 ## Routes
 
-/ 
-  GET               ***
+/
+GET              ***
 
-/profa 
-  GET               ***
-  POST(admin)       ***
+/profa
+GET              ***
+POST(admin)      ***
 
-/profa/:id 
-  GET(admin)        ***
-  POST              ***
-  DELETE(admin)     ***
-  PATCH(admin)
+/profa/:id
+GET(admin)       ***
+POST             ***
+DELETE(admin)    ***
+PATCH(admin)     ***
 
-/namskeid 
-  GET               ***
-  POST(admin)       ***
+/namskeid
+GET              ***
+POST(admin)      ***
 
-/namskeid/:id 
-  GET               ***
-  POST              ***
-  DELETE(admin)     ***
-  PATCH(admin)
+/namskeid/:id
+GET              ***
+POST             ***
+DELETE(admin)    ***
+PATCH(admin)     ***
 
-/laera 
-  GET               ***
-  POST(admin)       TODO-add to image/video service
+/laera
+GET              ***
+POST(admin)      TODO-add to image/video service
 
-/laera/:id 
-  GET               ***
-  DELETE(admin)
-  PATCH(admin)
+/laera/:id
+GET              ***
+DELETE(admin)    ***
+PATCH(admin)
 
-/users 
-  GET(admin)        ***
+/users
+GET(admin)       ***
 
-/users/me 
-  GET               ***
-  DELETE            ***
+/users/me
+GET              ***
+DELETE           ***
 
-/users/:id 
-  GET(admin)        ***
-  DELETE(admin)     ***
+/users/:id
+GET(admin)       ***
+DELETE(admin)    ***
 
 /users/login
-  POST              ***
+POST             ***
 
-/users/register 
-  POST              ***
+/users/register
+POST             ***
 
 ## Database tables
 
