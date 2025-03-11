@@ -13,7 +13,8 @@ CREATE TABLE IF NOT EXISTS public.practice (
 	duration interval not null,
 	ages text check (ages in ('5-7 ára', '8-12 ára', 'fullorðnir')) not null,
 	capacity int not null,
-	created timestamp with time zone not null default current_timestamp
+	created timestamp with time zone not null default current_timestamp,
+	updated timestamp with time zone not null default current_timestamp
 );
 
 CREATE TABLE IF NOT EXISTS public.practice_signups (
@@ -31,7 +32,8 @@ CREATE TABLE IF NOT EXISTS public.courses (
 	level text check (level in ('byrjendur', 'miðstig', 'hæsta stig')) not null,
 	start_date date not null,
 	end_date date not null,
-	created timestamp with time zone not null default current_timestamp
+	created timestamp with time zone not null default current_timestamp,
+	updated timestamp with time zone not null default current_timestamp
 );
 
 CREATE TABLE IF NOT EXISTS public.course_signups (
@@ -48,5 +50,31 @@ CREATE TABLE IF NOT EXISTS public.moves (
 	description text,
 	image varchar(256),
 	video varchar(256),
-	created timestamp with time zone not null default current_timestamp
+	created timestamp with time zone not null default current_timestamp,
+	updated timestamp with time zone not null default current_timestamp
 );
+
+
+-- TRIGGERS FOR AUTOUPDATING THE UPDATED ENTRY
+CREATE OR REPLACE FUNCTION update_updated_column()
+RETURNS TRIGGER AS $$
+BEGIN
+	NEW.updated = current_timestamp;
+	RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+CREATE TRIGGER update_practice_updated
+BEFORE UPDATE ON practice
+FOR EACH ROW
+EXECUTE FUNCTION update_updated_column();
+
+CREATE TRIGGER update_practice_updated
+BEFORE UPDATE ON courses
+FOR EACH ROW
+EXECUTE FUNCTION update_updated_column();
+
+CREATE TRIGGER update_practice_updated
+BEFORE UPDATE ON moves
+FOR EACH ROW
+EXECUTE FUNCTION update_updated_column();

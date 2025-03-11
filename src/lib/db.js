@@ -44,7 +44,6 @@ export async function pagedQuery(text, params = [], { limit = 10, offset = 0 }) 
   const data = await query(querySQL, [...params, limit, offset]);
 
 	const countSQL = `SELECT COUNT(*) AS total FROM (${text.replace(/ORDER BY .*/i, '')}) AS subquery`;
-	console.log(countSQL);
 	const countResult = await query(countSQL, params);
 	const total = parseInt(countResult.rows[0].total, 10);
 
@@ -68,9 +67,9 @@ export async function partialUpdate(table, id, fields, params) {
 		throw new Error('fields and params must be equal in length');
 	}
 
-	const updates = fieldsFiltered.map((field, index) => {
-		`${field} = $${i+2}`
-	});
+	const updates = fieldsFiltered.map((field, index) =>
+		`${field} = $${index+2}`
+	);
 
 	const updateSQL = `
 	  UPDATE ${table}
@@ -78,7 +77,7 @@ export async function partialUpdate(table, id, fields, params) {
 	  WHERE id = $1 
 	  RETURNING *`;
 
-	const result = await query(updateSQL, [...id, paramsFiltered]);
+	const result = await query(updateSQL, [id, ...paramsFiltered]);
 
 	return result;
 }

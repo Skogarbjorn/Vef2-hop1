@@ -1,5 +1,6 @@
 import { addPageMetadata } from "../lib/addPageMetadata.js";
-import { pagedQuery, query } from "../lib/db.js";
+import { pagedQuery, partialUpdate, query } from "../lib/db.js";
+import xss from 'xss';
 
 export async function listMoves(req, res) {
   const { offset = 0, limit = 10 } = req.query;
@@ -94,6 +95,7 @@ export async function updateMove(req, res) {
   ];
 
   //const result = await partialUpdate('moves', id,
+
 }
 
 export async function findById(id) {
