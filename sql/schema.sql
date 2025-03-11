@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS public.users (
 
 CREATE TABLE IF NOT EXISTS public.practice (
 	id serial primary key,
-	date timestamp with time zone not null unique,
+	date timestamp with time zone not null,
 	duration interval not null,
 	ages text check (ages in ('5-7 ára', '8-12 ára', 'fullorðnir')) not null,
 	capacity int not null,
