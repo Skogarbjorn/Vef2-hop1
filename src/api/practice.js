@@ -1,5 +1,5 @@
 import { addPageMetadata } from "../lib/addPageMetadata.js";
-import { pagedQuery, query } from "../lib/db.js";
+import { pagedQuery, partialUpdate, query } from "../lib/db.js";
 import xss from "xss";
 export async function listPractice(req, res) {
   const { limit = 5, offset = 0 } = req.query;
@@ -18,13 +18,12 @@ export async function listPractice(req, res) {
 
 export async function addPractice(req, res) {
   const { date, duration, ages, capacity } = req.body;
-  const dateISO = new Date(date).toISOString();
 
   const insertSQL = `
 	  INSERT INTO practice (date, duration, ages, capacity) VALUES ($1, $2, $3, $4) RETURNING *`;
 
   const result = await query(insertSQL, [
-    xss(dateISO),
+    date,
     xss(duration),
     xss(ages),
     xss(capacity),
@@ -105,32 +104,33 @@ export async function signToPractice(req, res) {
 }
 
 export async function updatePractice(req, res) {
-	const { id } = req.params;
-	const { date, duration, ages, capacity } = req.body;
+  const { id } = req.params;
+  const { date, duration, ages, capacity } = req.body;
 
-	const params = [
-		date instanceof Date ? date : null,
-		duration instanceof Date ? xss(duration) : null,
-		typeof ages === 'string' ? xss(ages) : null,
-		typeof capacity === 'number' ? xss(capacity) : null,
-	];
+  const params = [
+    date instanceof Date ? date : null,
+    duration instanceof Date ? xss(duration) : null,
+    typeof ages === "string" ? xss(ages) : null,
+    typeof capacity === "number" ? xss(capacity) : null,
+  ];
 
-	const fields = [
-		date instanceof Date ? 'date' : null,
-		duration instanceof Date ? 'duration' : null,
-		typeof ages === 'string' ? 'ages' : null,
-		typeof capacity === 'number' ? 'capacity' : null,
-	];
+  const fields = [
+    date instanceof Date ? "date" : null,
+    duration instanceof Date ? "duration" : null,
+    typeof ages === "string" ? "ages" : null,
+    typeof capacity === "number" ? "capacity" : null,
+  ];
 
-	const result = await partialUpdate('practice', id, fields, params);
+  const result = await partialUpdate("practice", id, fields, params);
 
-	if (!result) {
-		return res.status(500).json({ error: 'Something went wrong updating the move' });
-	}
+  if (!result) {
+    return res.status(500).json({
+      error: "Something went wrong updating the practice",
+    });
+  }
 
-	return res.status(200).json(result.rows);
+  return res.status(200).json(result.rows);
 }
-
 
 export async function deletePractice(req, res) {
   const { id } = req.params;
@@ -150,27 +150,4 @@ export async function deletePractice(req, res) {
   }
 
   return res.status(204).send();
-}
-
-export async function updatePractice(req, res) {
-  const { id } = req.params;
-  const { date, duration, ages, capacity } = req.body;
-  const dateISO = new Date(date).toISOString();
-
-  const updateSQL = `
-	  UPDATE practice SET date = $1, duration = $2, ages = $3, capacity = $4 WHERE id = $5 RETURNING *`;
-
-  const result = await query(updateSQL, [
-    xss(dateISO),
-    xss(duration),
-    xss(ages),
-    xss(capacity),
-    id,
-  ]);
-
-  if (!result) {
-    return res.status(500).json({ error: "Something went wrong" });
-  }
-
-  return res.status(200).json(result.rows);
 }

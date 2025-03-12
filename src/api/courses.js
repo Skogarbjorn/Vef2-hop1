@@ -1,5 +1,5 @@
 import { addPageMetadata } from "../lib/addPageMetadata.js";
-import { pagedQuery, query } from "../lib/db.js";
+import { pagedQuery, partialUpdate, query } from "../lib/db.js";
 import xss from "xss";
 
 export async function listCourses(req, res) {
@@ -53,8 +53,6 @@ export async function listCourse(req, res) {
 
 export async function addCourse(req, res) {
   const { name, description, level, start_date, end_date } = req.body;
-  const start_dateISO = new Date(start_date).toISOString();
-  const end_dateISO = new Date(end_date).toISOString();
 
   const insertSQL = `
 	  INSERT INTO courses (name, description, level, start_date, end_date)
@@ -65,8 +63,8 @@ export async function addCourse(req, res) {
     xss(name),
     xss(description),
     xss(level),
-    xss(start_dateISO),
-    xss(end_dateISO),
+    start_date,
+    end_date,
   ]);
 
   if (!result) {
@@ -117,24 +115,29 @@ export async function deleteCourse(req, res) {
 export async function updateCourse(req, res) {
   const { id } = req.params;
   const { name, description, level, start_date, end_date } = req.body;
-  const start_dateISO = new Date(start_date).toISOString();
-  const end_dateISO = new Date(end_date).toISOString();
 
-  const updateSQL = `
-	  UPDATE courses SET name = $1, description = $2, level = $3, start_date = $4, end_date = $5 WHERE id = $6 RETURNING *
-	`;
+  const params = [
+    typeof name === "string" ? xss(name) : null,
+    typeof description === "string" ? xss(description) : null,
+    typeof level === "string" ? xss(level) : null,
+    start_date instanceof Date ? start_date : null,
+    end_date instanceof Date ? end_date : null,
+  ];
 
-  const result = await query(updateSQL, [
-    xss(name),
-    xss(description),
-    xss(level),
-    xss(start_dateISO),
-    xss(end_dateISO),
-    id,
-  ]);
+  const fields = [
+    typeof name === "string" ? "name" : null,
+    typeof description === "string" ? "description" : null,
+    typeof level === "string" ? "level" : null,
+    start_date instanceof Date ? "start_date" : null,
+    end_date instanceof Date ? "end_date" : null,
+  ];
+
+  const result = await partialUpdate("courses", id, fields, params);
 
   if (!result) {
-    return res.status(500).json({ error: "Something went wrong" });
+    return res.status(500).json({
+      error: "Something went wrong updating the course",
+    });
   }
 
   return res.status(200).json(result.rows);
