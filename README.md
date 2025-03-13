@@ -28,8 +28,6 @@ Nær í lista af prufutímum:
 GET /profa
 ```
 
-<details>
-  <summary>Úttak</summary>
 ```
 {
     "data": [
@@ -108,7 +106,6 @@ GET /profa
     }
 }
 ```
-</details>
 
 Fær lista af öllum notendum (bara hægt sem admin)
 
