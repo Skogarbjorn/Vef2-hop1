@@ -244,14 +244,6 @@ export const moveDescriptionValidator = body("description")
 	.isLength({ max: 2000 })
 	.withMessage("description cannot be longer than 2000 characters");
 
-export const moveImageValidator = body("image")
-	.exists()
-	.withMessage("image must be sent, even if empty");
-
-export const moveVideoValidator = body("image")
-	.exists()
-	.withMessage("video must be sent, even if empty");
-
 export const moveIdValidator = param("id")
 	.exists()
 	.withMessage("move id must be specified")

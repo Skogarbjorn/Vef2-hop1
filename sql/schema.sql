@@ -30,8 +30,8 @@ CREATE TABLE IF NOT EXISTS public.courses (
 	name varchar(256) not null,
 	description text,
 	level text check (level in ('byrjendur', 'miðstig', 'hæsta stig')) not null,
-	start_date date not null,
-	end_date date not null,
+	start_date timestamp not null,
+	end_date timestamp not null,
 	created timestamp with time zone not null default current_timestamp,
 	updated timestamp with time zone not null default current_timestamp
 );
@@ -49,7 +49,6 @@ CREATE TABLE IF NOT EXISTS public.moves (
 	title varchar(128) not null,
 	description text,
 	image varchar(256),
-	video varchar(256),
 	created timestamp with time zone not null default current_timestamp,
 	updated timestamp with time zone not null default current_timestamp
 );

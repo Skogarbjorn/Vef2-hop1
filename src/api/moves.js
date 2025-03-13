@@ -1,6 +1,7 @@
 import { addPageMetadata } from "../lib/addPageMetadata.js";
 import { pagedQuery, partialUpdate, query } from "../lib/db.js";
 import xss from 'xss';
+import { uploadImage } from "../lib/hosting.js";
 
 export async function listMoves(req, res) {
   const { offset = 0, limit = 10 } = req.query;
@@ -39,17 +40,29 @@ export async function listMove(req, res) {
 }
 
 export async function addMove(req, res) {
-  const { title, description, image, video } = req.body;
+  const { title, description } = req.body;
+  const { path: imagePath } = req.file;
+
+  let image;
+  try {
+    const uploadResult = await uploadImage(imagePath);
+    if (!uploadResult || !uploadResult.secure_url) {
+      throw new Error('no secure url returned from cloudinary upload');
+    }
+    image = uploadResult.secure_url;
+  } catch (err) {
+    console.error(err);
+    return res.status(500).end();
+  }
 
   const insertSQL = `
-	  INSERT INTO moves (title, description, image, video)
-	  VALUES ($1, $2, $3, $4) RETURNING *`;
+	  INSERT INTO moves (title, description, image)
+	  VALUES ($1, $2, $3) RETURNING *`;
 
   const result = await query(insertSQL, [
     xss(title),
     xss(description),
-    xss(image),
-    xss(video),
+    xss(image)
   ]);
 
   if (!result) {
@@ -78,24 +91,45 @@ export async function deleteMove(req, res) {
 
 export async function updateMove(req, res) {
   const { id } = req.params;
-  const { title, description, image, video } = req.body;
+  const { title, description } = req.body;
+  const { file: { path: imagePath } = {} } = req
 
   const params = [
     typeof title === "string" ? xss(title) : null,
-    typeof description === "string" ? xss(description) : null,
-    typeof image === "string" ? xss(image) : null,
-    typeof video === "string" ? xss(video) : null,
+    typeof description === "string" ? xss(description) : null
   ];
 
   const fields = [
     typeof title === "string" ? "title" : null,
-    typeof description === "string" ? "description" : null,
-    typeof image === "string" ? "image" : null,
-    typeof video === "string" ? "video" : null,
+    typeof description === "string" ? "description" : null
   ];
 
-  //const result = await partialUpdate('moves', id,
+  if (imagePath) {
+    let image;
+    try {
+      const uploadResult = await uploadImage(imagePath);
+      if (!uploadResult || !uploadResult.secure_url) {
+        throw new Error('no secure url returned from cloudinary upload');
+      }
+      image = uploadResult.secure_url;
+    } catch (err) {
+      console.error(err);
+      return res.status(500).end();
+    }
 
+    params.push(image);
+    fields.push("image");
+  }
+
+  const result = await partialUpdate('moves', id, fields, params);
+
+  if (!result) {
+    return res.status(500).json({
+      error: "Something went wrong updating the move",
+    });
+  }
+
+  return res.status(200).json(result.rows);
 }
 
 export async function findById(id) {

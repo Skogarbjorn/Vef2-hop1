@@ -14,9 +14,7 @@ import {
   levelValidator,
   moveDescriptionValidator,
   moveIdValidator,
-  moveImageValidator,
   moveTitleValidator,
-  moveVideoValidator,
   nameValidator,
   pagingQuerystringValidator,
   practiceCapacityNotFullValidator,
@@ -51,6 +49,7 @@ import {
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { readFile } from "node:fs/promises";
+import { withMulter } from "../lib/multer.js";
 
 export const router = express.Router();
 
@@ -189,10 +188,9 @@ router.get(
 router.post(
   "/laera",
   requireAdmin,
+  withMulter,
   moveTitleValidator,
   moveDescriptionValidator,
-  moveImageValidator,
-  moveVideoValidator,
   validationCheck,
   catchErrors(addMove),
 );
@@ -213,14 +211,12 @@ router.delete(
   catchErrors(deleteMove),
 );
 
-// incomplete, still have to add hosting and shit
 router.patch(
   "/laera/:id",
+  withMulter,
   moveIdValidator,
   moveTitleValidator,
   moveDescriptionValidator,
-  moveImageValidator,
-  moveVideoValidator,
   validationCheck,
   catchErrors(updateMove),
 );
