@@ -23,7 +23,7 @@ POST /users/login
 
 ## API Routes
 
-Nær í lista af prufutímum:
+Nær í lista af prufutímum (hægt án þess að vera loggaður inn):
 ```
 GET /profa
 ```
@@ -107,6 +107,23 @@ GET /profa
 }
 ```
 
+Skrá sig inn á námskeið (þarf að vera loggaður inn):
+
+```
+POST /namskeid/[id]
+```
+
+```
+[
+    {
+        "id": 12,
+        "user_id": 1,
+        "course_id": 1,
+        "signup_date": "2025-03-13T20:20:33.854Z"
+    }
+]
+```
+
 Fær lista af öllum notendum (bara hægt sem admin)
 
 ```
@@ -141,7 +158,7 @@ GET /users
 }
 ```
 
-Býr til nýtt námskeið:
+Býr til nýtt námskeið (bara hægt sem admin):
 
 ```
 POST /namskeid
@@ -169,7 +186,7 @@ POST /namskeid
 ]
 ```
 
-Og einnig er hægt að uppfæra námskeið með ```PATCH``` í stað ```POST```, á t.d. ```/namskeid/22```.
+Og einnig er hægt að uppfæra námskeið með ```PATCH``` í stað ```POST```, á t.d. ```/namskeid/11```, og eyða með ```DELETE``` líka.
 
 o.s.frv.
 
