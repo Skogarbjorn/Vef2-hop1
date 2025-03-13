@@ -49,7 +49,6 @@ CREATE TABLE IF NOT EXISTS public.moves (
 	title varchar(128) not null,
 	description text,
 	image varchar(256),
-	video varchar(256),
 	created timestamp with time zone not null default current_timestamp,
 	updated timestamp with time zone not null default current_timestamp
 );
