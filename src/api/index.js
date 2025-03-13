@@ -211,9 +211,9 @@ router.delete(
   catchErrors(deleteMove),
 );
 
-// incomplete, still have to add hosting and shit
 router.patch(
   "/laera/:id",
+  withMulter,
   moveIdValidator,
   moveTitleValidator,
   moveDescriptionValidator,
