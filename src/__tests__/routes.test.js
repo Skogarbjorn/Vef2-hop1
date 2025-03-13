@@ -1,6 +1,6 @@
 import request from "supertest";
 import app from "../app.js";
-import { expect, test } from "@jest/globals";
+import { beforeAll, expect, test } from "@jest/globals";
 
 let authToken = "";
 
