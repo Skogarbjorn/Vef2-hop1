@@ -1,4 +1,4 @@
-import { validationResult } from 'express-validator';
+import { validationResult } from "express-validator";
 
 export function validationCheck(req, res, next) {
   const validation = validationResult(req);
@@ -6,9 +6,11 @@ export function validationCheck(req, res, next) {
   if (!validation.isEmpty()) {
     const errors = validation.errors.map((error) => {
       try {
-        return typeof error.msg === 'string' ? JSON.parse(error.msg) : error.msg;
+        return typeof error.msg === "string"
+          ? JSON.parse(error.msg)
+          : error.msg;
       } catch {
-        return { msg: error.msg, type: 'validation' }; 
+        return { msg: error.msg, type: "validation" };
       }
     });
 
