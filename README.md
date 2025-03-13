@@ -9,6 +9,18 @@ npm install
 
 Svo þarf að fylla út öll svæði sem vantar í .env.example og breyta nafni í .env
 
+Hægt er svo að búa til gögn upp á nýtt með
+
+```
+npm run build
+```
+
+Og svo bara keyra með
+
+```
+npm run start
+```
+
 ## Notkun
 
 Hægt er að logga sig inn á admin aðgang með:
