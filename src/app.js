@@ -1,3 +1,4 @@
+import cors from "cors";
 import express from "express";
 import expressWs from "express-ws";
 import path from "node:path";
