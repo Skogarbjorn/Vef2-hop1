@@ -12,8 +12,18 @@ const app = express();
 expressWs(app);
 
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 app.use(express.static(path.join(__dirname, "public")));
+app.use(
+  cors({
+    origin: [
+      "https://x-xx-hopverk2-vef-forr-x-xx.vercel.app",
+      "http://localhost:3000",
+    ],
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+    credentials: true,
+  }),
+);
 
 app.set("views", path.join(__dirname, "src/views"));
 app.set("view engine", "ejs");
@@ -33,7 +43,7 @@ app.use((err, _req, res, _next) => {
 export default app;
 
 if (process.env.NODE_ENV !== "test") {
-  const PORT = process.env.PORT || 3000;
+  const PORT = process.env.PORT || 3001;
   const HOST = process.env.NODE_ENV === "production" ? "0.0.0.0" : "localhost";
 
   app.listen(PORT, HOST, () => {
